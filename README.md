@@ -16,10 +16,10 @@
   <!--<img src="https://github.com/deaspo/tunza_sacco/blob/master/screenshots/pp.png" />-->
 </br>
 <p>Below is a screenhot of the <b>HTML</b> for the homepage</p>
-<h2>ZCurrent <b>HTML</b> view for the homepage </h2>
+<h2>Current <b>HTML</b> view for the homepage </h2>
 <br>
-  <img src="https://github.com/deaspo/deaspo_studios/blob/master/screenshots/p1.png" width=100% />
-  <img src="https://github.com/deaspo/deaspo_studios/blob/master/screenshots/p2.png" width=100% />
+  <img src="https://github.com/deaspo/deaspo_studios/blob/master/screenshots/new_home.png" width=100% />
+  <img src="https://github.com/deaspo/deaspo_studios/blob/master/screenshots/new_home2.png" width=100% />
 </br>
 <p><b>Updating all the remaining pages currently</b></p>
 <p> To keep updating as progress is made </p>

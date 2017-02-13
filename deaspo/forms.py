@@ -1,10 +1,13 @@
 # coding=utf-8
 from django import forms
-from django.forms import ModelForm
-from deaspo.models import Project, Product, Plan, ProductWebOrder, UserProfile,UserNext, Comment, Contact
 from django.contrib.auth.models import User
+from django.forms import ModelForm
 from registration.forms import RegistrationForm
-from django.contrib.auth.forms import UserCreationForm
+
+from deaspo.models import ProductWebOrder, UserNext, Comment, Contact, OrderAddress, MobileOrders, DesktopOrders, \
+    AnalyticOrder
+
+
 class WebOrderForm(ModelForm):
     class Meta:
         model = ProductWebOrder
@@ -70,4 +73,135 @@ class ContactForm(forms.ModelForm):
             'cl_email':forms.EmailInput(attrs={'class': "form-control", 'placeholder': "E-mail Address", 'name': "email",'id':"email",'required':"required",'autofocus':""}),
             'cl_name':forms.TextInput(attrs={'class': "form-control", 'placeholder': "Name", 'name': "name",'id':"name",'required':"required"}),
             'cl_message':forms.Textarea(attrs={'class':"form-control",'placeholder':"Your Message.",'id':"message",'name':"message",'rows':"5",'required':"required"})
+        }
+
+
+class AddressOrderForm(forms.ModelForm):
+    class Meta:
+        model = OrderAddress
+        fields = {'fname', 'cname', 'sname', 'zcode', 'city', 'country', 'pnumber', 'email', 'dname', 'edomain', 'app',
+                  'hosting_plan', 'hosting_plan_price', 'dprice', 'eprice', 'aprice'}
+        widgets = {
+            'fname': forms.TextInput(
+                attrs={'placeholder': "Full names", 'class': "form-control", 'id': "fullname", 'required': "",
+                       'minlength': "2"}),
+            'cname': forms.TextInput(
+                attrs={'placeholder': "Company name", 'class': "form-control", 'id': "company", 'required': "",
+                       'minlength': "2"}),
+            'sname': forms.TextInput(
+                attrs={'placeholder': "street", 'class': "form-control", 'id': "street", 'required': "",
+                       'minlength': "2"}),
+            'zcode': forms.NumberInput(
+                attrs={'placeholder': "zipcode", 'class': "form-control", 'id': "zip", 'min': "0", 'minlength': "5",
+                       'maxlength': "5"}),
+            'city': forms.TextInput(
+                attrs={'placeholder': "City", 'class': "form-control", 'id': "city", 'required': "", 'minlength': "5"}),
+            'country': forms.Select(attrs={'id': "country", 'required': "", 'class': "form-control"}),
+            'pnumber': forms.NumberInput(
+                attrs={'placeholder': "Reachable phone number", 'class': "form-control", 'id': "phone", 'min': "0",
+                       'minlength': "10", 'maxlength': "10"}),
+            'email': forms.EmailInput(
+                attrs={'class': "form-control", 'placeholder': "E-mail Address", 'name': "email", 'id': "email",
+                       'required': "required"}),
+            'dname': forms.CheckboxInput(attrs={'class': "checkbox"}),
+            'hosting_plan': forms.HiddenInput(attrs={'value': "{{ service.pname }}"}),
+            'hosting_plan_price': forms.HiddenInput(attrs={'value': "{{ splan.pn_yearly }}"}),
+            'dprice': forms.HiddenInput(),
+            'eprice': forms.HiddenInput(),
+            'aprice': forms.HiddenInput()
+        }
+
+
+class MobileOrderForm(forms.ModelForm):
+    class Meta:
+        model = MobileOrders
+        fields = {'fname', 'cname', 'sname', 'zcode', 'city', 'country', 'pnumber', 'email', 'hosting_plan',
+                  'hosting_start_price', 'platform'}
+        widgets = {
+            'fname': forms.TextInput(
+                attrs={'placeholder': "Full names", 'class': "form-control", 'id': "fullname", 'required': "",
+                       'minlength': "2"}),
+            'cname': forms.TextInput(
+                attrs={'placeholder': "Company name", 'class': "form-control", 'id': "company", 'required': "",
+                       'minlength': "2"}),
+            'sname': forms.TextInput(
+                attrs={'placeholder': "street", 'class': "form-control", 'id': "street", 'required': "",
+                       'minlength': "2"}),
+            'zcode': forms.NumberInput(
+                attrs={'placeholder': "zipcode", 'class': "form-control", 'id': "zip", 'min': "0", 'minlength': "5",
+                       'maxlength': "5"}),
+            'city': forms.TextInput(
+                attrs={'placeholder': "City", 'class': "form-control", 'id': "city", 'required': "", 'minlength': "5"}),
+            'country': forms.Select(attrs={'id': "country", 'required': "", 'class': "form-control"}),
+            'pnumber': forms.NumberInput(
+                attrs={'placeholder': "Reachable phone number", 'class': "form-control", 'id': "phone", 'min': "0",
+                       'minlength': "10", 'maxlength': "10"}),
+            'email': forms.EmailInput(
+                attrs={'class': "form-control", 'placeholder': "E-mail Address", 'name': "email", 'id': "email",
+                       'required': "required"}),
+            'hosting_plan': forms.HiddenInput(attrs={'value': "{{ service.pname }}"}),
+            'platform': forms.Select(attrs={'id': "platform", 'class': "form-control", 'required': ""})
+        }
+
+
+class DesktopOrderForm(forms.ModelForm):
+    class Meta:
+        model = DesktopOrders
+        fields = {'fname', 'cname', 'sname', 'zcode', 'city', 'country', 'pnumber', 'email', 'hosting_plan',
+                  'hosting_start_price', 'platform'}
+        widgets = {
+            'fname': forms.TextInput(
+                attrs={'placeholder': "Full names", 'class': "form-control", 'id': "fullname", 'required': "",
+                       'minlength': "2"}),
+            'cname': forms.TextInput(
+                attrs={'placeholder': "Company name", 'class': "form-control", 'id': "company", 'required': "",
+                       'minlength': "2"}),
+            'sname': forms.TextInput(
+                attrs={'placeholder': "street", 'class': "form-control", 'id': "street", 'required': "",
+                       'minlength': "2"}),
+            'zcode': forms.NumberInput(
+                attrs={'placeholder': "zipcode", 'class': "form-control", 'id': "zip", 'min': "0", 'minlength': "5",
+                       'maxlength': "5"}),
+            'city': forms.TextInput(
+                attrs={'placeholder': "City", 'class': "form-control", 'id': "city", 'required': "", 'minlength': "5"}),
+            'country': forms.Select(attrs={'id': "country", 'required': "", 'class': "form-control"}),
+            'pnumber': forms.NumberInput(
+                attrs={'placeholder': "Reachable phone number", 'class': "form-control", 'id': "phone", 'min': "0",
+                       'minlength': "10", 'maxlength': "10"}),
+            'email': forms.EmailInput(
+                attrs={'class': "form-control", 'placeholder': "E-mail Address", 'name': "email", 'id': "email",
+                       'required': "required"}),
+            'hosting_plan': forms.HiddenInput(attrs={'value': "{{ service.pname }}"}),
+            'platform': forms.Select(attrs={'id': "platform", 'class': "form-control", 'required': ""})
+        }
+
+
+class AnalyticOrderForm(forms.ModelForm):
+    class Meta:
+        model = AnalyticOrder
+        fields = {'fname', 'cname', 'sname', 'zcode', 'city', 'country', 'pnumber', 'email', 'hosting_plan',
+                  'hosting_start_price'}
+        widgets = {
+            'fname': forms.TextInput(
+                attrs={'placeholder': "Full names", 'class': "form-control", 'id': "fullname", 'required': "",
+                       'minlength': "2"}),
+            'cname': forms.TextInput(
+                attrs={'placeholder': "Company name", 'class': "form-control", 'id': "company", 'required': "",
+                       'minlength': "2"}),
+            'sname': forms.TextInput(
+                attrs={'placeholder': "street", 'class': "form-control", 'id': "street", 'required': "",
+                       'minlength': "2"}),
+            'zcode': forms.NumberInput(
+                attrs={'placeholder': "zipcode", 'class': "form-control", 'id': "zip", 'min': "0", 'minlength': "5",
+                       'maxlength': "5"}),
+            'city': forms.TextInput(
+                attrs={'placeholder': "City", 'class': "form-control", 'id': "city", 'required': "", 'minlength': "5"}),
+            'country': forms.Select(attrs={'id': "country", 'required': "", 'class': "form-control"}),
+            'pnumber': forms.NumberInput(
+                attrs={'placeholder': "Reachable phone number", 'class': "form-control", 'id': "phone", 'min': "0",
+                       'minlength': "10", 'maxlength': "10"}),
+            'email': forms.EmailInput(
+                attrs={'class': "form-control", 'placeholder': "E-mail Address", 'name': "email", 'id': "email",
+                       'required': "required"}),
+            'hosting_plan': forms.HiddenInput(attrs={'value': "{{ service.pname }}"})
         }

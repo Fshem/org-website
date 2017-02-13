@@ -1,25 +1,23 @@
-from django.shortcuts import render, redirect, render_to_response, get_object_or_404
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
-from django.http import HttpResponse, HttpResponseRedirect
-from django.db.models import Q
-from deaspo.models import Product, Project, ProductWebOrder, EmailPlan, Plan, UserNext, Staff
-from deaspo.forms import WebOrderForm, UserForm, CommentForm, ContactForm
-from django.template import RequestContext
-from django.contrib.auth.models import User
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, render_to_response, get_object_or_404
+from django.template import RequestContext
 from registration.backends.simple.views import RegistrationView
-from django.utils.http import is_safe_url
-from registration.models import RegistrationProfile
 
-from django.contrib import messages
+from deaspo.forms import CommentForm, ContactForm, AddressOrderForm, MobileOrderForm, DesktopOrderForm, \
+    AnalyticOrderForm
+from deaspo.models import Product, Project, EmailPlan, Plan, Staff
+
 
 # Create your views here.
 
 class RegisterView(RegistrationView):
     def get_success_url(self, user):
         try:
-            return '/services/'
+            return '/'
         except Exception, e:
             print str(e)
             pass
@@ -52,8 +50,18 @@ def services(request):
 
 def service(request, service_id):
     service = get_object_or_404(Product, pk=service_id)
+    if service.pname == "Mobile Apps Development":
+        page = 'services/mobile/index.html'
+    elif service.pname == "Desktop Applications":
+        page = 'services/desktop/index.html'
+    elif service.pname == "Data Analytics":
+        page = 'services/analytics/index.html'
+    else:
+        page = 'services/service.html'
     if request.POST:
+        next = request.GET.get('next')
         if request.POST['form-type'] == u"review-form":
+            cform = ContactForm()
             form = CommentForm(request.POST)
             if form.is_valid():
                 comment = form.save(commit=False)
@@ -61,16 +69,17 @@ def service(request, service_id):
                 comment.save()
                 messages.add_message(request, messages.SUCCESS, "Review posted!. We value your feedback!",
                                      fail_silently=True)
-                next = '/services/%d' % int(service_id)
-                HttpResponseRedirect(next)
+                form = CommentForm()
+                # HttpResponseRedirect('')
             else:
                 print form.errors
         else:
+            form = CommentForm()
             cform = ContactForm(request.POST)
             if cform.is_valid():
                 cform.save()
-                next = '/services/%d' % int(service_id)
-                HttpResponseRedirect(next)
+                cform = ContactForm()
+                #HttpResponseRedirect('')
     else:
         form = CommentForm()
         cform = ContactForm()
@@ -78,7 +87,9 @@ def service(request, service_id):
     half_preducts = (len(products) + 1) / 2
     # half_preducts = (products.count()+1)/2
     projects = Project.objects.all()  # return all the projects
-    return render(request, 'services/service.html', {'form':form,'cform':cform,'service': service,'services':products, 'projects':projects,'half':half_preducts})
+    return render(request, page,
+                  {'form': form, 'cform': cform, 'service': service, 'services': products, 'projects': projects,
+                   'half': half_preducts})
 
 @login_required
 def order(request, service_id, plan_id):
@@ -87,15 +98,28 @@ def order(request, service_id, plan_id):
     eplans = EmailPlan.objects.all()
     service =  get_object_or_404(Product, pk=service_id)
     splan = get_object_or_404(Plan, pk=plan_id)
-    activate = False
     if not request.POST:
-        form = WebOrderForm()
-        form.total_price = splan.pn_yearly
-
+        # form = WebOrderForm()
+        # form.total_price = splan.pn_yearly
+        form = AddressOrderForm()
     else:
-        form = WebOrderForm(request.POST)
-        form.hosting_plan = splan.pn_name
-    return render(request,'services/order.html',{'activate':activate,'eplans':eplans,'service':service,'splan':splan,'form':form,'services':products,'projects':projects,'email':request.user.email,'fullname':request.user.get_full_name(),'username':request.user.username,'picture':request.user.profile.picture})
+        form = AddressOrderForm(request.POST)
+        if form.is_valid():
+            form.hosting_plan = splan.pn_name
+            form.hosting_plan_price = splan.pn_yearly
+            if not request.POST['dname']:
+                form.dprice = 0.00
+            if not request.POST['edomain']:
+                form.eprice = 0.00
+            if not request.POST['app']:
+                form.aprice = 0.00
+            form.save()
+            return HttpResponseRedirect('/')
+
+    return render(request, 'services/order.html',
+                  {'eplans': eplans, 'service': service, 'splan': splan, 'form': form, 'services': products,
+                   'projects': projects, 'email': request.user.email, 'fullname': request.user.get_full_name(),
+                   'username': request.user.username, 'picture': request.user.profile.picture})
 
 
 def selfCheck(request, service_id, plan_id):
@@ -188,7 +212,7 @@ def sign_out(request):
     logout(request)
 
     # Take the user back to the homepage.
-    return HttpResponseRedirect('/services')
+    return HttpResponseRedirect('/')
 
 @login_required
 def profile(request):
@@ -245,7 +269,7 @@ def index(request):
         cform = ContactForm(request.POST)
         if cform.is_valid():
             cform.save()
-            return HttpResponseRedirect('/')
+            return redirect('/')
     else:
         cform = ContactForm()
     products = Product.objects.all() #returns all the products and services
@@ -253,3 +277,77 @@ def index(request):
     #half_preducts = (products.count()+1)/2
     projects = Project.objects.all()#return all the projects
     return render(request, "base.html", {'services':products, 'projects':projects, 'cform':cform, 'half':half_preducts})
+
+
+def test(request):
+    if request.POST:
+        cform = ContactForm(request.POST)
+        if cform.is_valid():
+            cform.save()
+            return HttpResponseRedirect('/')
+    else:
+        cform = ContactForm()
+    products = Product.objects.all()  # returns all the products and services
+    projects = Project.objects.all()  # return all the projects
+    return render(request, '500.html', {'services': products, 'projects': projects, 'cform': cform})
+
+
+@login_required
+def analyticOrder(request, service_id):
+    products = Product.objects.all()  # returns all the products and services
+    projects = Project.objects.all()  # return all the projects
+    service = get_object_or_404(Product, pk=service_id)
+
+    if not request.POST:
+        form = AnalyticOrderForm()
+    else:
+        form = AnalyticOrderForm(request.POST)
+        if form.is_valid():
+            form.hosting_plan = service.pname
+            form.hosting_plan_price = service.p_mstart_price
+            return HttpResponseRedirect('/')
+    return render(request, 'services/analytics/order.html',
+                  {'service': service, 'form': form, 'services': products, 'projects': projects,
+                   'email': request.user.email, 'fullname': request.user.get_full_name(),
+                   'username': request.user.username, 'picture': request.user.profile.picture})
+
+
+@login_required
+def desktopOrder(request, service_id):
+    products = Product.objects.all()  # returns all the products and services
+    projects = Project.objects.all()  # return all the projects
+    service = get_object_or_404(Product, pk=service_id)
+
+    if not request.POST:
+        form = DesktopOrderForm()
+    else:
+        form = DesktopOrderForm(request.POST)
+        if form.is_valid():
+            form.hosting_plan = service.pname
+            form.hosting_plan_price = service.p_mstart_price
+            return HttpResponseRedirect('/')
+    return render(request, 'services/desktop/order.html',
+                  {'service': service, 'form': form, 'services': products, 'projects': projects,
+                   'email': request.user.email, 'fullname': request.user.get_full_name(),
+                   'username': request.user.username, 'picture': request.user.profile.picture})
+
+
+@login_required
+def mobileOrder(request, service_id):
+    products = Product.objects.all()  # returns all the products and services
+    projects = Project.objects.all()  # return all the projects
+    service = get_object_or_404(Product, pk=service_id)
+
+    if not request.POST:
+        form = MobileOrderForm()
+    else:
+        form = MobileOrderForm(request.POST)
+        if form.is_valid():
+            form.hosting_plan = service.pname
+            form.hosting_plan_price = service.p_mstart_price
+            form = MobileOrderForm()
+            return HttpResponseRedirect('/')
+    return render(request, 'services/mobile/order.html',
+                  {'service': service, 'form': form, 'services': products, 'projects': projects,
+                   'email': request.user.email, 'fullname': request.user.get_full_name(),
+                   'username': request.user.username, 'picture': request.user.profile.picture})

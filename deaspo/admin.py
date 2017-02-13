@@ -1,5 +1,9 @@
 from django.contrib import admin
-from deaspo.models import Project, Product, Plan, EmailPlan, ProductWebOrder, UserProfile, Comment, Contact, Staff, Social
+
+from deaspo.models import Project, Product, Plan, EmailPlan, ProductWebOrder, UserProfile, Comment, Contact, Staff, \
+    Social, OrderAddress, DesktopOrders, MobileOrders, AnalyticOrder
+
+
 #add search and related projects functionality
 class ProductSearch(admin.ModelAdmin):
     list_display = ['pname']
@@ -21,6 +25,10 @@ class SocialAdmin(admin.ModelAdmin):
     list_display = ['get_category_display']
 
 
+class OrdersAdmin(admin.ModelAdmin):
+    list_display = ['fname', 'hosting_plan', 'email']
+
+
 
 # Register your models here.
 admin.site.register(Product, ProductSearch)
@@ -33,3 +41,7 @@ admin.site.register(Contact)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Staff, StaffSearch)
 admin.site.register(Social, SocialAdmin)
+admin.site.register(OrderAddress, OrdersAdmin)
+admin.site.register(AnalyticOrder)
+admin.site.register(MobileOrders)
+admin.site.register(DesktopOrders)

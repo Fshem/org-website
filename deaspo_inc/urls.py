@@ -13,23 +13,26 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
 from django.conf import settings
+from django.conf.urls import url, include
 from django.conf.urls.static import static
-from django.contrib import staticfiles
 from django.contrib import admin
+
 from deaspo import views
-from deaspo.forms import RegistrationFormWithNext
-import services
+
+# import services
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
-    url(r'^services/?$', views.services, name='services'),
+    #url(r'^services/?$', views.services, name='services'),
     url(r'^service/(\d+)/?$', views.service, name='service'),
     url(r'^projects/?$',views.projects,name='projects'),
     url(r'^project/(\d+)/?$', views.project,name='project'),
     url(r'^service/(\d+)/(\d+)/order$', views.order, name='order'),
+    url(r'^mobile/(\d+)/order$', views.mobileOrder, name='mobile'),
+    url(r'^desktop/(\d+)/order$', views.desktopOrder, name='desktop'),
+    url(r'^analytic/(\d+)/order$', views.analyticOrder, name='analytics'),
     url(r'check/(\d+)/(\d+)/?$', views.selfCheck,name='check'),
     url(r'login/?$', views.signin,name='login'),
     url(r'logout/?$',views.sign_out,name='logout'),
@@ -39,7 +42,7 @@ urlpatterns = [
     url(r'delete_user/(\d+)/?$',views.del_user,name='delete_user'),
     url(r'about/?$',views.about,name="about"),
     url(r'^accounts/', include('registration.backends.simple.urls')),
-#    url(r'^test/?$',views.testing,name='test'),
+    url(r'^test/?$', views.test, name='test'),
 ]
 
 if settings.DEBUG:
